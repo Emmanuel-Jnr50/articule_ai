@@ -8,11 +8,37 @@ import sparkle from './assets/sparkle.svg';
 
 function App () {
   const [showResult, setShowResult] = useState(false);
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setShowResult(true);
+
+    console.log("SUBMIT FIRED");
+    try {
+      const response = await fetch("http://localhost:5000/api/articulate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message,
+          situation,
+          tone,
+          level,
+        }),
+      });
+
+      const data = await response.json();
+
+      setResult(data.result);
+      setShowResult(true);
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
-  
+  const [result, setResult] = useState("");
+  const [message, setMessage] = useState("");
+  const [situation, setSituation] = useState("");
+  const [tone, setTone] = useState("");
+  const [level, setLevel] = useState("");
 
   return (
     <div className="flex items-center justify-center h-screen max-sm:h-fit bg-gray-100 font-[Uto]">
@@ -24,37 +50,37 @@ function App () {
         </div>
 
           <form onSubmit={handleSubmit} className='flex flex-wrap gap-4 mt-5'>
-            <input type="text" placeholder="Type what you're trying to say..." className='w-full p-4 border-[#93b2e5] border-2 rounded-xl mt-4 placeholder:text-[#8cb0e9]' />
+            <textarea value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Type what you're trying to say..." className='w-full p-4 border-[#93b2e5] border-2 rounded-xl mt-4 placeholder:text-[#8cb0e9] resize-none' />
 
             <label className='w-full mt-3'>
               <span className='text-gray-600 text-[18px] font-medium max-sm:text-[16px]'>Situation</span>
-              <textarea type="text" placeholder='Describe the situation...' className='w-full p-3 border border-gray-300 rounded-md mt-4 h-20 placeholder:absolute placeholder:top-3 placeholder:text-gray-700 max-sm:placeholder:text-[14px]' />
+              <textarea value={situation} onChange={(e) => setSituation(e.target.value)} placeholder='Describe the situation...' className='w-full p-3 border border-gray-300 rounded-md mt-4 h-20 placeholder:absolute placeholder:top-3 placeholder:text-gray-700 max-sm:placeholder:text-[14px] resize-none' />
             </label>
 
             <label class="relative w-full mt-3">
               <span class="text-gray-600 text-[18px] font-medium max-sm:text-[16px]">Tone</span>
-              <select class="w-full p-3 text-gray-700 bg-white border border-gray-300 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mt-4 text-[14px]">
-                <option disabled selected >How do you want to sound?</option>
-                <option>Casual</option>
-                <option>Professional</option>
-                <option>Diplomatic</option>
-                <option>Polite</option>
-                <option>Assertive</option>
+              <select value={tone} onChange={(e) => setTone(e.target.value)} class="w-full p-3 text-gray-700 bg-white border border-gray-300 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mt-4 text-[14px]">
+                <option value="" disabled>How do you want to sound?</option>
+                <option value="Casual">Casual</option>
+                <option value="Professional">Professional</option>
+                <option value="Diplomatic">Diplomatic</option>
+                <option value="Polite">Polite</option>
+                <option value="Assertive">Assertive</option>
               </select>
               {/* <!-- Custom Arrow Graphic --> */}
               <div class="absolute inset-y-0 top-11.25 right-0 flex items-center px-3 pointer-events-none text-gray-500">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
               </div>
             </label>
-
+    
             <label class="relative w-full mt-3">
               <span class="text-gray-600 text-[18px] font-medium max-sm:text-[16px]">Level</span>
-              <select class="w-full p-3 text-gray-700 bg-white border border-gray-300 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mt-4 text-[14px]">
-                <option disabled selected >How articulate?</option>
-                <option>Simple</option>
-                <option>Natural</option>
-                <option>Articulate</option>
-                <option>Advanced </option>
+              <select value={level} onChange={(e) => setLevel(e.target.value)} class="w-full p-3 text-gray-700 bg-white border border-gray-300 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mt-4 text-[14px]">
+                <option value="" disabled>How articulate?</option>
+                <option value="Simple">Simple</option>
+                <option value="Natural">Natural</option>
+                <option value="Articulate">Articulate</option>
+                <option value="Advanced">Advanced</option>
               </select>
               {/* <!-- Custom Arrow Graphic --> */}
               <div class="absolute inset-y-0 top-11.25 right-0 flex items-center px-3 pointer-events-none text-gray-500">
@@ -65,9 +91,10 @@ function App () {
             <button type='submit' className='p-5 bg-linear-to-b from-[#ABBFDE] to-[#5E92E0] w-full rounded-2xl mt-1.5 font-bold text-xl text-white/90 flex items-center justify-center gap-2 active:scale-[0.95] duration-300 max-sm:mt-4 max-sm:text-lg'> <img src={sparkle} alt="" className='w-6.5 max-sm:w-5.5' /> Articulate</button>
 
             {showResult && (
-              <div className="flex flex-col p-5 bg-[#e9edf3] font-[Uto] border-2 border-[#93b2e5] rounded-2xl mt-4">
+              <div className="flex flex-col p-5 bg-[#e9edf3] font-[Uto] border-2 border-[#93b2e5] rounded-2xl mt-4 w-full">
                 <h2 className='text-[#5E92E0] font-bold text-[20px] max-sm:text-[18px]'>Your articulated version:</h2>
-                <p className='text-[#5E92E0] mt-2 text-[18px] max-sm:text-[16px]'>I understand your perspective, but I have some concerns regarding the current requirements.</p>
+                {/* <p className='text-[#5E92E0] mt-2 text-[18px] max-sm:text-[16px]'>I understand your perspective, but I have some concerns regarding the current requirements.</p> */}
+                <p className='text-[#5E92E0] mt-2 text-[18px] max-sm:text-[16px]'>{result}</p>
               </div>
             )}
           </form>
